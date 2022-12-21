@@ -10,15 +10,28 @@ from aiogram.dispatcher import FSMContext
 from function_implementation import ZhmihImage
 from function_implementation import AddUpperCaption
 from function_implementation import AddLowerCaption
-
+from function_implementation import DeleteTemp
+from function_implementation import ClearAfterPhotoSend
 
 #Import config
 from bot_config import key
+from bot_config import memory_mode
 
 
 #Bot setup
 bot = Bot(key)
 dp = Dispatcher(bot, storage=MemoryStorage())
+
+
+#Memory clear
+async def AbortedFunctionClear(name):
+	if memory_mode == "discard":
+		DeleteTemp("files/inputs/" + name)
+
+
+async def CompletedFunctionClear(name):
+	if memory_mode == "discard":
+		ClearAfterPhotoSend(name)
 
 
 #Bot code goes here
@@ -55,6 +68,7 @@ async def ApplyZhmih(message: types.Message, state: FSMContext):
 		print("Photo from " + message.from_user.username + " was downloaded at files/inputs folder, its name is " + name)
 		ZhmihImage("files/inputs/" + name, "files/outputs/" + name, message.from_user.id)
 		await bot.send_photo(message.chat.id, types.InputFile("files/outputs/" + name))
+		await CompletedFunctionClear(name)
 	else:
 		await message.answer("Ой, у тебя фотка какая-то странная. Не могу обработать")
 	await state.finish()
@@ -98,12 +112,12 @@ async def GetTextForUpperCaption(message: types.Message, state: FSMContext):
 		name = "error"
 		async with state.proxy() as data:
 			name = data['photo_name']
-		print(message.text)
-		print(name)
 		AddUpperCaption("files/inputs/" + name, "files/outputs/" + name, message.text)
 		await bot.send_photo(message.chat.id, types.InputFile("files/outputs/" + name))
+		await CompletedFunctionClear(name)
 	else:
 		await message.answer("Ой, у тебя текст какой-то странный. Не могу обработать")
+		await AbortedFunctionClear(name)
 	await state.finish()
 
 
@@ -134,11 +148,12 @@ async def GetTextForLowerCaption(message: types.Message, state: FSMContext):
                 name = "error"
                 async with state.proxy() as data:
                         name = data['photo_name']
-                print(message.text)
                 AddLowerCaption("files/inputs/" + name, "files/outputs/" + name, message.text)
                 await bot.send_photo(message.chat.id, types.InputFile("files/outputs/" + name))
+                await CompletedFunctionClear(name)
         else:
                 await message.answer("Ой, у тебя текст какой-то странный. Не могу обработать")
+                await AbortedFunctionClear(name)
         await state.finish()
 
 
