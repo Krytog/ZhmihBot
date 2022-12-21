@@ -27,6 +27,12 @@ def DeleteTemp(name):
 	return
 
 
+def ClearAfterPhotoSend(name):
+	os.system("rm files/outputs/" + name)
+	os.system("rm files/inputs/" + name)
+	return
+
+
 def HandleImage(input_name, output_name, argument):	#THIS FUNCTION IS FOR DEBUGGING ONLY! USING IT IN BOT WILL CAUSE HORRIBLE ERRORS!
 	ConvertToFit(input_name, "_temp.bmp")
 	InvokeImageProcessor("_temp.bmp", "_out.bmp", argument)
@@ -57,13 +63,13 @@ def ZhmihImage(input_name, output_name, id = 0):
 	return
 
 
-def AddUpperCaption(input_name, caption):
-	prompt = "convert " + input_name + " -stroke black -strokewidth 4 -font Ubuntu-Mono-Bold -pointsize 96 -fill white -gravity north -annotate +0+0" + " '" + caption + "' " + input_name
+def AddUpperCaption(input_name, output_name, caption):
+	prompt = "convert " + input_name + " -stroke black -strokewidth 4 -font Ubuntu-Mono-Bold -pointsize 96 -fill white -gravity north -annotate +0+0" + " '" + caption + "' " + output_name
 	os.system(prompt)
 	return
 
-def AddLowerCaption(input_name, caption):
-	prompt = "convert " + input_name + " -stroke black -strokewidth 4 -font Ubuntu-Mono-Bold -pointsize 96 -fill white -gravity south -annotate +0+0" + " '" + caption + "' " + input_name
+def AddLowerCaption(input_name, output_name, caption):
+	prompt = "convert " + input_name + " -stroke black -strokewidth 4 -font Ubuntu-Mono-Bold -pointsize 96 -fill white -gravity south -annotate +0+0" + " '" + caption + "' " + output_name
 	os.system(prompt)
 	return
 
